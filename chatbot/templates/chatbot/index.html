@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevHelp - FAQ Chatbot</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chatbot/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">✦</div>
+            <h1>DevHelp Chatbot</h1>
+            <p>Your intelligent FAQ assistant</p>
+            <span class="status">● Ready to help</span>
+        </header>
+
+        <main>
+            <div class="welcome">
+                <h2>Hello there! 👋</h2>
+                <p>Ask me about Python, Django, AI, web development, or internships.</p>
+            </div>
+
+            <div id="chat-box" aria-live="polite">
+                <div class="message bot">
+                    <strong>DevHelp:</strong>
+                    Hi! What would you like to know?
+                </div>
+            </div>
+
+            <p class="suggestion-title">SUGGESTED QUESTIONS</p>
+
+            <div class="suggestions">
+                {% for question in faqs %}
+                <button type="button" class="suggestion"
+                        data-question="{{ question }}">
+                    {{ question }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <form id="chat-form">
+                {% csrf_token %}
+                <input type="text" id="user-input"
+                       placeholder="Type your question..."
+                       maxlength="500" required>
+                <button type="submit" id="send-button">Send ➤</button>
+            </form>
+
+            <button type="button" id="clear-button" class="clear-button">
+                Clear conversation
+            </button>
+        </main>
+
+        <footer>
+            CodeAlpha AI Internship · Task 2
+            <br>
+            Built with Django, NLTK and scikit-learn
+        </footer>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("user-input");
+        const sendButton = document.getElementById("send-button");
+
+        function addMessage(sender, text) {
+            const message = document.createElement("div");
+            message.className =
+                sender === "You" ? "message user" : "message bot";
+
+            const label = document.createElement("strong");
+            label.textContent = sender + ": ";
+
+            const content = document.createElement("span");
+            content.textContent = text;
+
+            message.append(label, content);
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage(question) {
+            question = question.trim();
+            if (!question) return;
+
+            addMessage("You", question);
+            input.value = "";
+            sendButton.disabled = true;
+
+            try {
+                const response = await fetch("/chat/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({ message: question })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.answer || "Request failed");
+                }
+
+                addMessage("DevHelp", data.answer);
+
+                if (data.matched_question) {
+                    addMessage(
+                        "Matched FAQ",
+                        data.matched_question
+                    );
+                }
+            } catch (error) {
+                addMessage(
+                    "DevHelp",
+                    error.message.includes("CSRF")
+                        ? "Security token error. Refresh the page and try again."
+                        : "Could not connect to the chatbot. Please try again."
+                );
+            } finally {
+                sendButton.disabled = false;
+                input.focus();
+            }
+        }
+
+        function getCookie(name) {
+            const cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "=")) {
+                    return decodeURIComponent(
+                        cookie.substring(name.length + 1)
+                    );
+                }
+            }
+            return "";
+        }
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            sendMessage(input.value);
+        });
+
+        document.querySelectorAll(".suggestion").forEach(button => {
+            button.addEventListener("click", () => {
+                sendMessage(button.dataset.question);
+            });
+        });
+
+        document.getElementById("clear-button")
+            .addEventListener("click", () => {
+                chatBox.replaceChildren();
+                addMessage("DevHelp", "Conversation cleared! Ask me anything.");
+            });
+    </script>
+</body>
+</html>

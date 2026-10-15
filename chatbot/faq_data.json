@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is Python?",
+    "answer": "Python is a programming language used for web development, automation, data analysis, and artificial intelligence."
+  },
+  {
+    "question": "What is HTML?",
+    "answer": "HTML defines the structure and content of a web page."
+  },
+  {
+    "question": "What is CSS?",
+    "answer": "CSS styles web pages with colors, fonts, layouts, and spacing."
+  },
+  {
+    "question": "What is JavaScript?",
+    "answer": "JavaScript makes websites interactive and dynamic."
+  },
+  {
+    "question": "What is Django?",
+    "answer": "Django is a Python web framework for building web applications."
+  },
+  {
+    "question": "What is machine learning?",
+    "answer": "Machine learning enables computers to learn patterns from data."
+  },
+  {
+    "question": "What is NLP?",
+    "answer": "Natural Language Processing helps computers process and understand human language."
+  },
+  {
+    "question": "What is GitHub?",
+    "answer": "GitHub hosts Git repositories and supports code sharing and collaboration."
+  },
+  {
+    "question": "What is an API?",
+    "answer": "An API allows different software applications to communicate."
+  },
+  {
+    "question": "How can I apply for an internship?",
+    "answer": "Prepare a resume, build projects, and apply through official company career pages and trusted internship platforms."
+  }
+]
